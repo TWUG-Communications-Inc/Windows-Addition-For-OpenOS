@@ -61,27 +61,6 @@ private:                                                                        
 // * ActionEventArgs holds a single IActionArgs. For events that don't need
 //   additional args, this can be nullptr.
 
-template<>
-constexpr size_t Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(const winrt::Microsoft::Terminal::Settings::Model::IActionArgs& args)
-{
-    return gsl::narrow_cast<size_t>(args.Hash());
-}
-
-template<>
-constexpr size_t Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(const winrt::Microsoft::Terminal::Settings::Model::NewTerminalArgs& args)
-{
-    return gsl::narrow_cast<size_t>(args.Hash());
-}
-
-// Retrieves the hash value for an empty-constructed object.
-template<typename T>
-static size_t EmptyHash()
-{
-    // cache the value of the empty hash
-    static const size_t cachedHash = winrt::make_self<T>()->Hash();
-    return cachedHash;
-}
-
 namespace winrt::Microsoft::Terminal::Settings::Model::implementation
 {
     using namespace ::Microsoft::Terminal::Settings::Model;
@@ -185,9 +164,18 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_ColorScheme = _ColorScheme;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Commandline(), StartingDirectory(), TabTitle(), TabColor(), ProfileIndex(), Profile(), SuppressApplicationTitle(), ColorScheme());
+            til::hasher h{ hasherState };
+            h.write(Commandline());
+            h.write(StartingDirectory());
+            h.write(TabTitle());
+            h.write(TabColor());
+            h.write(ProfileIndex());
+            h.write(Profile());
+            h.write(SuppressApplicationTitle());
+            h.write(ColorScheme());
+            return h.finalize();
         }
     };
 
@@ -241,9 +229,12 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_CopyFormatting = _CopyFormatting;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(SingleLine(), CopyFormatting());
+            til::hasher h{ hasherState };
+            h.write(SingleLine());
+            h.write(CopyFormatting());
+            return h.finalize();
         }
     };
 
@@ -288,9 +279,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_TerminalArgs = _TerminalArgs.Copy();
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(TerminalArgs());
+            til::hasher h{ hasherState };
+            h.write(TerminalArgs());
+            return h.finalize();
         }
     };
 
@@ -339,9 +332,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_TabIndex = _TabIndex;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(TabIndex());
+            til::hasher h{ hasherState };
+            h.write(TabIndex());
+            return h.finalize();
         }
     };
 
@@ -390,9 +385,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_TabIndex = _TabIndex;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(TabIndex());
+            til::hasher h{ hasherState };
+            h.write(TabIndex());
+            return h.finalize();
         }
     };
 
@@ -446,9 +443,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_ResizeDirection = _ResizeDirection;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(ResizeDirection());
+            til::hasher h{ hasherState };
+            h.write(ResizeDirection());
+            return h.finalize();
         }
     };
 
@@ -505,9 +504,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_FocusDirection = _FocusDirection;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(FocusDirection());
+            til::hasher h{ hasherState };
+            h.write(FocusDirection());
+            return h.finalize();
         }
     };
 
@@ -564,9 +565,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Direction = _Direction;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Direction());
+            til::hasher h{ hasherState };
+            h.write(Direction());
+            return h.finalize();
         }
     };
 
@@ -613,9 +616,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Delta = _Delta;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Delta());
+            til::hasher h{ hasherState };
+            h.write(Delta());
+            return h.finalize();
         }
     };
 
@@ -665,9 +670,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Input = _Input;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Input());
+            til::hasher h{ hasherState };
+            h.write(Input());
+            return h.finalize();
         }
     };
 
@@ -749,9 +756,14 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_SplitSize = _SplitSize;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(SplitDirection(), TerminalArgs(), SplitMode(), SplitSize());
+            til::hasher h{ hasherState };
+            h.write(SplitDirection());
+            h.write(TerminalArgs());
+            h.write(SplitMode());
+            h.write(SplitSize());
+            return h.finalize();
         }
     };
 
@@ -800,9 +812,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Target = _Target;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Target());
+            til::hasher h{ hasherState };
+            h.write(Target());
+            return h.finalize();
         }
     };
 
@@ -855,9 +869,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_SchemeName = _SchemeName;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(SchemeName());
+            til::hasher h{ hasherState };
+            h.write(SchemeName());
+            return h.finalize();
         }
     };
 
@@ -906,9 +922,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_TabColor = _TabColor;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(TabColor());
+            til::hasher h{ hasherState };
+            h.write(TabColor());
+            return h.finalize();
         }
     };
 
@@ -955,9 +973,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Title = _Title;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Title());
+            til::hasher h{ hasherState };
+            h.write(Title());
+            return h.finalize();
         }
     };
 
@@ -1010,9 +1030,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Commandline = _Commandline;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Commandline());
+            til::hasher h{ hasherState };
+            h.write(Commandline());
+            return h.finalize();
         }
     };
 
@@ -1061,9 +1083,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Index = _Index;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Index());
+            til::hasher h{ hasherState };
+            h.write(Index());
+            return h.finalize();
         }
     };
 
@@ -1112,9 +1136,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Index = _Index;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Index());
+            til::hasher h{ hasherState };
+            h.write(Index());
+            return h.finalize();
         }
     };
 
@@ -1163,9 +1189,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Index = _Index;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Index());
+            til::hasher h{ hasherState };
+            h.write(Index());
+            return h.finalize();
         }
     };
 
@@ -1221,9 +1249,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Direction = _Direction;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Direction());
+            til::hasher h{ hasherState };
+            h.write(Direction());
+            return h.finalize();
         }
     };
 
@@ -1270,9 +1300,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_RowsToScroll = _RowsToScroll;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(RowsToScroll());
+            til::hasher h{ hasherState };
+            h.write(RowsToScroll());
+            return h.finalize();
         }
     };
 
@@ -1319,9 +1351,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_RowsToScroll = _RowsToScroll;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(RowsToScroll());
+            til::hasher h{ hasherState };
+            h.write(RowsToScroll());
+            return h.finalize();
         }
     };
 
@@ -1370,9 +1404,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_LaunchMode = _LaunchMode;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(LaunchMode());
+            til::hasher h{ hasherState };
+            h.write(LaunchMode());
+            return h.finalize();
         }
     };
 
@@ -1428,9 +1464,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Direction = _Direction;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Direction());
+            til::hasher h{ hasherState };
+            h.write(Direction());
+            return h.finalize();
         }
     };
 
@@ -1475,9 +1513,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_TerminalArgs = _TerminalArgs.Copy();
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(TerminalArgs());
+            til::hasher h{ hasherState };
+            h.write(TerminalArgs());
+            return h.finalize();
         }
     };
 
@@ -1525,9 +1565,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_SwitcherMode = _SwitcherMode;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(SwitcherMode());
+            til::hasher h{ hasherState };
+            h.write(SwitcherMode());
+            return h.finalize();
         }
     };
 
@@ -1575,9 +1617,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_SwitcherMode = _SwitcherMode;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(SwitcherMode());
+            til::hasher h{ hasherState };
+            h.write(SwitcherMode());
+            return h.finalize();
         }
     };
 
@@ -1625,9 +1669,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Name = _Name;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Name());
+            til::hasher h{ hasherState };
+            h.write(Name());
+            return h.finalize();
         }
     };
 
@@ -1709,9 +1755,15 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             args->_DropdownDuration = 200;
             return { *args, {} };
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(Name(), Desktop(), Monitor(), DropdownDuration(), ToggleVisibility());
+            til::hasher h{ hasherState };
+            h.write(Name());
+            h.write(Desktop());
+            h.write(Monitor());
+            h.write(DropdownDuration());
+            h.write(ToggleVisibility());
+            return h.finalize();
         }
     };
 
@@ -1759,9 +1811,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Id = _Id;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(_Id);
+            til::hasher h{ hasherState };
+            h.write(Id());
+            return h.finalize();
         }
     };
 
@@ -1809,9 +1863,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Clear = _Clear;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(_Clear);
+            til::hasher h{ hasherState };
+            h.write(Clear());
+            return h.finalize();
         }
     };
 
@@ -1858,9 +1914,11 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             copy->_Actions = _Actions;
             return *copy;
         }
-        size_t Hash() const
+        size_t Hash(size_t hasherState) const
         {
-            return ::Microsoft::Terminal::Settings::Model::HashUtils::HashProperty(_Actions);
+            til::hasher h{ hasherState };
+            h.write(winrt::get_abi(_Actions));
+            return h.finalize();
         }
     };
 }
